@@ -48,4 +48,4 @@ app.get('/', function (req, res) {
     }
 
 })
-.listen(3000);
+.listen(process.argv[2] || 3000);
