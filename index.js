@@ -6,7 +6,7 @@ var db = {};
 db.movies = new Datastore({ filename: 'db/movies', autoload: true });
 
 app.use(express.bodyParser());
-
+ 
 app.get('/', function (req, res) {
 
     res.send('The API is working.');
@@ -48,4 +48,4 @@ app.get('/', function (req, res) {
     }
 
 })
-.listen(3050);
+.listen(3000);
