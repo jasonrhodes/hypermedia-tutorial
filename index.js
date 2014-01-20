@@ -59,36 +59,4 @@ app.get('/', function (req, res) {
             break;
     }
 })
-.post('/rpc', function (req, res) {
-    var body = req.body
-    var respond = function (err, response) {
-        if (err) {
-            res.send(JSON.stringify(err));
-        } else {
-            res.send(JSON.stringify(response));
-        }
-    };
-    
-    res.set('Content-type', 'application/json');
-
-    switch (body.action) {  
-        case "getMovies":
-            db.movies.find({}, respond);
-            break;
-
-        case "addMovie":
-            db.movies.insert({ title: req.body.title }, respond);
-            break;
-
-        case "rateMovie":
-            db.movies.update({ title: body.title }, { $set: { rating: body.rating } }, function (err, num) {
-                respond(err, { success: num + " records updated" });
-            });
-            break;
-
-        default:
-            respond({ error: "No action given" });
-    }
-
-})
 .listen(process.argv[2] || 3050);
