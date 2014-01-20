@@ -2,15 +2,7 @@ var express = require('express');
 var app = express();
 var Datastore = require('nedb');
 var db = {};
-var setupResponder = function (res) {
-    return function (err, response) {
-        if (err) {
-            res.send(JSON.stringify(err));
-        } else {
-            res.send(JSON.stringify(response));
-        }
-    };
-};
+var responder = require('./httpResponder');
 
 // Connect to an NeDB database
 db.movies = new Datastore({ filename: 'db/movies', autoload: true });
@@ -18,17 +10,21 @@ db.movies = new Datastore({ filename: 'db/movies', autoload: true });
 // Necessary for accessing POST data via req.body object
 app.use(express.bodyParser());
 
+// Catch-all route to set global values
+app.use(function (req, res, next) {
+    res.set('Content-type', 'application/json');
+    next();
+});
+
 // Routes
 app.get('/', function (req, res) {
     res.send('The API is working.');
-})
-.post('/movies', function (req, res) {
-    var body = req.body;
-    var respond = setupResponder(res);
+});
 
-    res.set('Content-type', 'application/json');
+app.post('/movies', function (req, res) {
+    var respond = responder.setup(res);
 
-    switch (body.action) {
+    switch (req.body.action) {
         case "viewList":
             db.movies.find({}, respond);
             break;
@@ -40,23 +36,22 @@ app.get('/', function (req, res) {
         default:
             respond({ error: "No action given in request." });
     }
-})
-.post('/movies/:id', function (req, res) {
-    var body = req.body;
-    var respond = setupResponder(res);
+});
 
-    res.set('Content-type', 'application/json');
+app.post('/movies/:id', function (req, res) {
+    var respond = responder.setup(res);
 
-    switch (body.action) {
+    switch (req.body.action) {
         case "view":
             db.movies.findOne({ _id: req.params.id }, respond);
             break;
 
         case "rate":
-            db.movies.update({ _id: req.params.id }, { $set: { rating: body.rating } }, function (err, num) {
+            db.movies.update({ _id: req.params.id }, { $set: { rating: req.body.rating } }, function (err, num) {
                 respond(err, { success: num + " records updated" });
             });
             break;
     }
-})
-.listen(process.argv[2] || 3050);
+});
+
+app.listen(process.argv[2] || 3050);
