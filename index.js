@@ -12,7 +12,8 @@ app.use(express.bodyParser());
 
 // Catch-all route to set global values
 app.use(function (req, res, next) {
-    res.set('Content-type', 'application/json');
+    res.type('application/json');
+    res.locals.respond = responder.setup(res);
     next();
 });
 
@@ -22,36 +23,36 @@ app.get('/', function (req, res) {
 });
 
 app.post('/movies', function (req, res) {
-    var respond = responder.setup(res);
 
     switch (req.body.action) {
         case "viewList":
-            db.movies.find({}, respond);
+            db.movies.find({}, res.locals.respond);
             break;
 
         case "addNew":
-            db.movies.insert({ title: req.body.title }, respond);
+            db.movies.insert({ title: req.body.title }, res.locals.respond);
             break;
 
         default:
-            respond({ error: "No action given in request." });
+            res.locals.respond({ error: "No action given in request." });
     }
+
 });
 
 app.post('/movies/:id', function (req, res) {
-    var respond = responder.setup(res);
 
     switch (req.body.action) {
         case "view":
-            db.movies.findOne({ _id: req.params.id }, respond);
+            db.movies.findOne({ _id: req.params.id }, res.locals.respond);
             break;
 
         case "rate":
             db.movies.update({ _id: req.params.id }, { $set: { rating: req.body.rating } }, function (err, num) {
-                respond(err, { success: num + " records updated" });
+                res.locals.respond(err, { success: num + " records updated" });
             });
             break;
     }
+
 });
 
 app.listen(process.argv[2] || 3050);
