@@ -22,6 +22,43 @@ app.use(express.bodyParser());
 app.get('/', function (req, res) {
     res.send('The API is working.');
 })
+.post('/movies', function (req, res) {
+    var body = req.body;
+    var respond = setupResponder(res);
+
+    res.set('Content-type', 'application/json');
+
+    switch (body.action) {
+        case "viewList":
+            db.movies.find({}, respond);
+            break;
+
+        case "addNew":
+            db.movies.insert({ title: req.body.title }, respond);
+            break;
+
+        default:
+            respond({ error: "No action given in request." });
+    }
+})
+.post('/movies/:id', function (req, res) {
+    var body = req.body;
+    var respond = setupResponder(res);
+
+    res.set('Content-type', 'application/json');
+
+    switch (body.action) {
+        case "view":
+            db.movies.findOne({ _id: req.params.id }, respond);
+            break;
+
+        case "rate":
+            db.movies.update({ _id: req.params.id }, { $set: { rating: body.rating } }, function (err, num) {
+                respond(err, { success: num + " records updated" });
+            });
+            break;
+    }
+})
 .post('/rpc', function (req, res) {
     var body = req.body
     var respond = function (err, response) {
