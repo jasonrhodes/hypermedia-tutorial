@@ -2,6 +2,15 @@ var express = require('express');
 var app = express();
 var Datastore = require('nedb');
 var db = {};
+var setupResponder = function (res) {
+    return function (err, response) {
+        if (err) {
+            res.send(JSON.stringify(err));
+        } else {
+            res.send(JSON.stringify(response));
+        }
+    };
+};
 
 // Connect to an NeDB database
 db.movies = new Datastore({ filename: 'db/movies', autoload: true });
