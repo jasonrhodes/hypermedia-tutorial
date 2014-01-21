@@ -44,20 +44,4 @@ app.delete('/movies/:id', function (req, res) {
     db.movies.remove({ _id: req.params.id }, res.locals.respond);
 });
 
-app.post('/movies/:id', function (req, res) {
-
-    switch (req.body.action) {
-        case "view":
-            db.movies.findOne({ _id: req.params.id }, res.locals.respond);
-            break;
-
-        case "rate":
-            db.movies.update({ _id: req.params.id }, { $set: { rating: req.body.rating } }, function (err, num) {
-                res.locals.respond(err, { success: num + " records updated" });
-            });
-            break;
-    }
-
-});
-
 app.listen(process.argv[2] || 3050);
