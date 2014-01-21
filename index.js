@@ -22,21 +22,26 @@ app.get('/', function (req, res) {
     res.send('The API is working.');
 });
 
+app.get('/movies', function (req, res) {
+    db.movies.find({}, res.locals.respond);
+});
+
 app.post('/movies', function (req, res) {
+    db.movies.insert({ title: req.body.title }, res.locals.respond);
+});
 
-    switch (req.body.action) {
-        case "viewList":
-            db.movies.find({}, res.locals.respond);
-            break;
+app.get('/movies/:id', function (req, res) {
+    db.movies.findOne({ _id: req.params.id }, res.locals.respond);
+});
 
-        case "addNew":
-            db.movies.insert({ title: req.body.title }, res.locals.respond);
-            break;
+app.put('/movies/:id', function (req, res) {
+    db.movies.update({ _id: req.params.id }, req.body, function (err, num) {
+            res.locals.respond(err, { success: num + " records updated" });
+        });
+});
 
-        default:
-            res.locals.respond({ error: "No action given in request." });
-    }
-
+app.delete('/movies/:id', function (req, res) {
+    db.movies.remove({ _id: req.params.id }, res.locals.respond);
 });
 
 app.post('/movies/:id', function (req, res) {
