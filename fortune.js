@@ -1,0 +1,1 @@
+var fortune = require("fortune");
