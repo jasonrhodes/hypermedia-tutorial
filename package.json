@@ -2,6 +2,7 @@
   "dependencies": {
     "nedb": "~0.9.4",
     "express": "~3.4.8",
-    "underscore": "~1.5.2"
+    "underscore": "~1.5.2",
+    "fortune": "~0.1.17"
   }
 }
