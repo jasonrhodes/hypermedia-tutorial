@@ -8,6 +8,7 @@ var app = fortune({
 app.resource('movie', {
 	title: String,
 	rating: Number,
+	genres: Array,
 	director: 'director',
 	cast: ['actor']
 });
